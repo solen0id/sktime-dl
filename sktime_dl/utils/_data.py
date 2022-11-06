@@ -3,12 +3,11 @@
 __author__ = "James Large"
 
 import pandas as pd
-from sktime.utils.data_processing import from_nested_to_3d_numpy
-from sktime.utils.validation.panel import check_X, check_X_y
+from sktime.utils.validation.panel import check_X, check_X_y, from_nested_to_3d_numpy
 
 
 def check_and_clean_data(X, y=None, input_checks=True):
-    '''
+    """
     Performs basic sktime data checks and prepares the train data for input to
     Keras models.
 
@@ -21,7 +20,7 @@ def check_and_clean_data(X, y=None, input_checks=True):
     Returns
     -------
     X
-    '''
+    """
     if input_checks:
         if y is None:
             check_X(X)
@@ -46,17 +45,19 @@ def check_and_clean_data(X, y=None, input_checks=True):
 
     if len(X.shape) == 2:
         # add a dimension to make it multivariate with one dimension
-        X = X.values.reshape(
-            X.shape[0], X.shape[1], 1
-        )  # go from [n][m] to [n][m][d=1]
+        X = X.values.reshape(X.shape[0], X.shape[1], 1)  # go from [n][m] to [n][m][d=1]
     # return transposed data to conform with current model formats
     return X.transpose(0, 2, 1)
 
 
-def check_and_clean_validation_data(validation_X, validation_y,
-                                    label_encoder=None,
-                                    onehot_encoder=None, input_checks=True):
-    '''
+def check_and_clean_validation_data(
+    validation_X,
+    validation_y,
+    label_encoder=None,
+    onehot_encoder=None,
+    input_checks=True,
+):
+    """
     Performs basic sktime data checks and prepares the validation data for
     input to Keras models. Also provides functionality to encode the y labels
     using label encoders that should have already been fit to the train data.
@@ -70,19 +71,18 @@ def check_and_clean_validation_data(validation_X, validation_y,
             the encoder that has already been fit to the train data
     :param input_checks: whether to perform the basic input structure checks
     :return: ( validation_X, validation_y ), or None if no data given
-    '''
+    """
     if validation_X is not None:
-        validation_X = check_and_clean_data(validation_X, validation_y,
-                                            input_checks=input_checks)
+        validation_X = check_and_clean_data(
+            validation_X, validation_y, input_checks=input_checks
+        )
     else:
         return None
 
     if label_encoder is not None and onehot_encoder is not None:
         validation_y = label_encoder.transform(validation_y)
-        validation_y = validation_y.reshape(
-            len(validation_y), 1)
-        validation_y = onehot_encoder.fit_transform(
-            validation_y)
+        validation_y = validation_y.reshape(len(validation_y), 1)
+        validation_y = onehot_encoder.fit_transform(validation_y)
 
     return (validation_X, validation_y)
 

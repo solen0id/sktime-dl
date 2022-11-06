@@ -4,12 +4,12 @@
 __author__ = "James Large"
 __all__ = ["CNNClassifier"]
 
-from sktime_dl.classification._classifier import BaseDeepClassifier
-from sktime_dl.networks._cnn import CNNNetwork
-from sktime_dl.utils import check_and_clean_data, \
-    check_and_clean_validation_data
 from sklearn.utils import check_random_state
 from tensorflow import keras
+
+from sktime_dl.classification._classifier import BaseDeepClassifier
+from sktime_dl.networks._cnn import CNNNetwork
+from sktime_dl.utils import check_and_clean_data, check_and_clean_validation_data
 
 
 class CNNClassifier(BaseDeepClassifier, CNNNetwork):
@@ -44,22 +44,22 @@ class CNNClassifier(BaseDeepClassifier, CNNNetwork):
     """
 
     def __init__(
-            self,
-            nb_epochs=2000,
-            batch_size=16,
-            kernel_size=7,
-            avg_pool_size=3,
-            nb_conv_layers=2,
-            filter_sizes=[6, 12],
-            callbacks=None,
-            random_state=0,
-            verbose=False,
-            model_name="cnn",
-            model_save_directory=None,
+        self,
+        nb_epochs=2000,
+        batch_size=16,
+        kernel_size=7,
+        avg_pool_size=3,
+        nb_conv_layers=2,
+        filter_sizes=[6, 12],
+        callbacks=None,
+        random_state=0,
+        verbose=False,
+        model_name="cnn",
+        model_save_directory=None,
     ):
         super(CNNClassifier, self).__init__(
-            model_save_directory=model_save_directory,
-            model_name=model_name)
+            model_save_directory=model_save_directory, model_name=model_name
+        )
         self.filter_sizes = filter_sizes
         self.nb_conv_layers = nb_conv_layers
         self.avg_pool_size = avg_pool_size
@@ -91,9 +91,9 @@ class CNNClassifier(BaseDeepClassifier, CNNNetwork):
         """
         input_layer, output_layer = self.build_network(input_shape, **kwargs)
 
-        output_layer = keras.layers.Dense(
-            units=nb_classes, activation="sigmoid"
-        )(output_layer)
+        output_layer = keras.layers.Dense(units=nb_classes, activation="sigmoid")(
+            output_layer
+        )
 
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
         model.compile(
@@ -104,8 +104,9 @@ class CNNClassifier(BaseDeepClassifier, CNNNetwork):
 
         return model
 
-    def fit(self, X, y, input_checks=True, validation_X=None,
-            validation_y=None, **kwargs):
+    def _fit(
+        self, X, y, input_checks=True, validation_X=None, validation_y=None, **kwargs
+    ):
         """
         Fit the classifier on the training set (X, y)
 
@@ -142,10 +143,9 @@ class CNNClassifier(BaseDeepClassifier, CNNNetwork):
         X = check_and_clean_data(X, y, input_checks=input_checks)
         y_onehot = self.convert_y(y)
 
-        validation_data = \
-            check_and_clean_validation_data(validation_X, validation_y,
-                                            self.label_encoder,
-                                            self.onehot_encoder)
+        validation_data = check_and_clean_validation_data(
+            validation_X, validation_y, self.label_encoder, self.onehot_encoder
+        )
 
         # ignore the number of instances, X.shape[0],
         # just want the shape of each instance
